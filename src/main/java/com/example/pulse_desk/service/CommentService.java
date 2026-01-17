@@ -1,10 +1,12 @@
 package com.example.pulse_desk.service;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.example.pulse_desk.dto.CommentResponse;
+import com.example.pulse_desk.exception.ResourceNotFoundException;
 import com.example.pulse_desk.model.Comment;
 import com.example.pulse_desk.model.CommentStatus;
 import com.example.pulse_desk.repository.CommentRepository;
@@ -24,6 +26,10 @@ public class CommentService {
                 .toList();
     }
 
+    public CommentResponse getCommentById(Long id){
+        return repository.findById(id).map(this::toResponse).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
+    }
+
 
     private CommentResponse toResponse(Comment comment) {
         return new CommentResponse(
@@ -37,10 +43,12 @@ public class CommentService {
 
     public CommentResponse submitComment(String content, Long userId){
         Comment comment = new Comment(content, userId, CommentStatus.RECEIVED);
-        repository.save(comment);
-        return new CommentResponse(comment.getId(), comment.getContent(), comment.getUserId(), comment.getStatus().name(), comment.getCreatedAt());
+        Comment saved = repository.save(comment);
+        return new CommentResponse(saved.getId(), saved.getContent(), saved.getUserId(), saved.getStatus().name(), saved.getCreatedAt());
 
     }
+
+
 
 
 
