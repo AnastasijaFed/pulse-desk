@@ -5,7 +5,7 @@ import com.example.pulse_desk.model.TicketPriority;
 
 
 
-public record AITicketDecision(
+public record AiTicketDecision(
         boolean shouldCreateTicket,
         String title,
         String category,   
