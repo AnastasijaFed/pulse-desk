@@ -4,29 +4,39 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.pulse_desk.ai.AiTicketDecision;
+import com.example.pulse_desk.ai.AiTriageService;
 import com.example.pulse_desk.dto.CommentResponse;
 import com.example.pulse_desk.exception.ResourceNotFoundException;
 import com.example.pulse_desk.model.Comment;
 import com.example.pulse_desk.model.CommentStatus;
+import com.example.pulse_desk.model.Ticket;
+import com.example.pulse_desk.model.TicketCategory;
+import com.example.pulse_desk.model.TicketPriority;
 import com.example.pulse_desk.repository.CommentRepository;
+import com.example.pulse_desk.repository.TicketRepository;
 
 @Service
 public class CommentService {
-    private final CommentRepository repository;
+    private final CommentRepository commentRepository;
+    private final AiTriageService aiService;
+    private final TicketRepository ticketRepository;
 
-    public CommentService(CommentRepository repository){
-        this.repository = repository;
+    public CommentService(CommentRepository commentRepository, AiTriageService aiService, TicketRepository ticketRepository ){
+        this.commentRepository = commentRepository;
+        this.aiService = aiService;
+        this.ticketRepository = ticketRepository;
     }
 
      public List<CommentResponse> getAllComments() {
-        return repository.findAll()
+        return commentRepository.findAll()
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     public CommentResponse getCommentById(Long id){
-        return repository.findById(id).map(this::toResponse).orElseThrow(() -> new ResourceNotFoundException("No comment with id "+ id));
+        return commentRepository.findById(id).map(this::toResponse).orElseThrow(() -> new ResourceNotFoundException("No comment with id "+ id));
     }
 
 
@@ -42,8 +52,26 @@ public class CommentService {
 
     public CommentResponse submitComment(String content, Long userId){
         Comment comment = new Comment(content, userId, CommentStatus.RECEIVED);
-        Comment saved = repository.save(comment);
-        return new CommentResponse(saved.getId(), saved.getContent(), saved.getUserId(), saved.getStatus().name(), saved.getCreatedAt());
+        commentRepository.save(comment);
+        try {
+
+            AiTicketDecision decision = aiService.analyzeComment(comment.getContent());
+            if (decision.shouldCreateTicket()) {
+
+            Ticket ticket = new Ticket(decision.title(), decision.summary(), TicketCategory.valueOf(decision.category().toUpperCase()), TicketPriority.valueOf(decision.priority().toUpperCase()), comment.getId());
+
+            ticketRepository.save(ticket);
+            comment.setStatus(CommentStatus.TICKET_CREATED);
+            }else{
+                comment.setStatus(CommentStatus.ANALYZED);
+            }
+
+        } catch (Exception ex) {
+            comment.setStatus(CommentStatus.ANALYSIS_FAILED);
+        }
+
+        commentRepository.save(comment);
+        return toResponse(comment);
 
     }
 

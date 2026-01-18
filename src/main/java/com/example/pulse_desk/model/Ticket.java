@@ -40,6 +40,7 @@ public class Ticket {
         this.summary = summary;
         this.category = category;
         this.commentId = commentId;
+        this.priority = priority;
         this.createdAt = Instant.now();
     }
     public Long getId(){

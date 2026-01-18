@@ -56,6 +56,14 @@ public class Comment {
         return createdAt;
     }
 
+   
+    public void setStatus(CommentStatus status){
+        this.status = status;
+    }
+
+ 
+
+
 
 
 
