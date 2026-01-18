@@ -1,7 +1,6 @@
 package com.example.pulse_desk.service;
-import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
+
 
 import org.springframework.stereotype.Service;
 
@@ -27,7 +26,7 @@ public class CommentService {
     }
 
     public CommentResponse getCommentById(Long id){
-        return repository.findById(id).map(this::toResponse).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
+        return repository.findById(id).map(this::toResponse).orElseThrow(() -> new ResourceNotFoundException("No comment with id "+ id));
     }
 
 

@@ -1,0 +1,4 @@
+huggingface:
+  base-url: https://api-inference.huggingface.co/models
+  model: google/flan-t5-base
+  timeout-ms: 8000

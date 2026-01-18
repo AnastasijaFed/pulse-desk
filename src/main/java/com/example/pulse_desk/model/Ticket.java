@@ -28,18 +28,18 @@ public class Ticket {
     private TicketPriority priority;
 
     @Column(nullable = false)
-    private Long userId;
+    private Long commentId;
 
     @Column(nullable = false)
     private Instant createdAt;
 
     protected Ticket(){}
 
-    public Ticket(String title, String summary, TicketCategory category, TicketPriority priority, Long userId){
+    public Ticket(String title, String summary, TicketCategory category, TicketPriority priority, Long commentId){
         this.title = title;
         this.summary = summary;
         this.category = category;
-        this.userId = userId;
+        this.commentId = commentId;
         this.createdAt = Instant.now();
     }
     public Long getId(){
@@ -62,8 +62,8 @@ public class Ticket {
         return priority;
     }
 
-    public Long getUserId(){
-        return userId;
+    public Long getCommentId(){
+        return commentId;
     }
     
     public Instant getCreatedAt(){
