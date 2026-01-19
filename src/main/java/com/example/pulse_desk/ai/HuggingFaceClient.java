@@ -37,8 +37,6 @@ public class HuggingFaceClient {
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .requestFactory(rf)
             .build();
-            System.out.println("HF TOKEN PRESENT = " + (hfToken != null && !hfToken.isBlank()));
-                System.out.println("HF_TOKEN starts with: " + (hfToken == null ? "null" : hfToken.substring(0, Math.min(6, hfToken.length()))));
     }
 
     public String generateText(String prompt) {

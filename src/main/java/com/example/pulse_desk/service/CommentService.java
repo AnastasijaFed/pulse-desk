@@ -13,10 +13,13 @@ import com.example.pulse_desk.model.CommentStatus;
 import com.example.pulse_desk.model.TicketCategory;
 import com.example.pulse_desk.model.TicketPriority;
 import com.example.pulse_desk.repository.CommentRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @Service
 public class CommentService {
+    private static final Logger log = LoggerFactory.getLogger(CommentService.class);
     private final CommentRepository commentRepository;
     private final AiTriageService aiService;
     private final TicketService ticketService;
@@ -56,16 +59,16 @@ public class CommentService {
 
             AiTicketDecision decision = aiService.analyzeComment(comment.getContent());
             if (decision.shouldCreateTicket()) {
-
-            ticketService.createNewTicket(decision.title(), decision.summary(), TicketCategory.valueOf(decision.category().toUpperCase()), TicketPriority.valueOf(decision.priority().toUpperCase()), comment.getId());
-            
-            comment.setStatus(CommentStatus.TICKET_CREATED);
+                log.info("Creating ticket for comment {}", comment.getId());
+                ticketService.createNewTicket(decision.title(), decision.summary(), TicketCategory.valueOf(decision.category().toUpperCase()), TicketPriority.valueOf(decision.priority().toUpperCase()), comment.getId());
+                comment.setStatus(CommentStatus.TICKET_CREATED);
             }else{
+                log.info("No ticket created for comment {}", comment.getId());
                 comment.setStatus(CommentStatus.ANALYZED);
             }
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("AI analysis failed for comment {}", comment.getId(), ex);
             comment.setStatus(CommentStatus.ANALYSIS_FAILED);
         }
 
