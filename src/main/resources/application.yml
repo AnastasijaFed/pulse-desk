@@ -1,4 +1,7 @@
 huggingface:
-  base-url: https://api-inference.huggingface.co/models
-  model: google/flan-t5-base
+  base-url: https://router.huggingface.co/v1
+  model: HuggingFaceTB/SmolLM3-3B:hf-inference
   timeout-ms: 8000
+logging:
+  level:
+    org.springframework.web.client: DEBUG

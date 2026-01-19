@@ -2,7 +2,7 @@ package com.example.pulse_desk.ai;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
+
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -37,28 +37,33 @@ public class HuggingFaceClient {
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .requestFactory(rf)
             .build();
+            System.out.println("HF TOKEN PRESENT = " + (hfToken != null && !hfToken.isBlank()));
+                System.out.println("HF_TOKEN starts with: " + (hfToken == null ? "null" : hfToken.substring(0, Math.min(6, hfToken.length()))));
     }
 
     public String generateText(String prompt) {
-        HfRequest body = new HfRequest(
-                prompt,
-                Map.of(
-                        "max_new_tokens", 220,
-                        "temperature", 0.0,
-                        "return_full_text", false
-                )
+        HfChatRequest body = new HfChatRequest(
+                model,
+                List.of(new HfChatRequest.Message("user", prompt)),
+                0.0,
+                600
         );
+        HfChatResponse response = restClient.post()
+            .uri("/chat/completions")
+            .body(body)
+            .retrieve()
+            .body(HfChatResponse.class);
 
-        List<HfGeneratedItem> response = restClient.post()
-                .uri("/" + model)
-                .body(body)
-                .retrieve()
-                .body(new org.springframework.core.ParameterizedTypeReference<List<HfGeneratedItem>>() {});
-
-        if (response == null || response.isEmpty() || response.get(0).generatedText() == null) {
-            throw new RuntimeException("Empty response from Hugging Face");
+        if (response == null || response.choices() == null || response.choices().isEmpty()) {
+                throw new RuntimeException("Empty response from Hugging Face router");
         }
 
-        return response.get(0).generatedText();
+        HfChatResponse.Message msg = response.choices().get(0).message();
+        if (msg == null || msg.content() == null || msg.content().isBlank()) {
+                throw new RuntimeException("No message content from Hugging Face router");
+        }
+
+        return msg.content();
+
     }
 }

@@ -65,6 +65,7 @@ public class CommentService {
             }
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             comment.setStatus(CommentStatus.ANALYSIS_FAILED);
         }
 

@@ -6,29 +6,26 @@ public class PromptFactory {
 
     public static String ticketTriagePrompt(String commentText) {
         return """
-            You are a support triage assistant.
-            Analyze the user comment and decide if it should become a support ticket.
+        Return ONLY a single valid JSON object. No markdown. No explanations. No <think> tags.
+        Do NOT include any text before or after the JSON.
 
-            Output ONLY valid JSON. No markdown. No extra text.
+        Schema:
+        {
+        "shouldCreateTicket": true|false,
+        "title": "...",
+        "category": "bug"|"feature"|"billing"|"account"|"other",
+        "priority": "low"|"medium"|"high",
+        "summary": "..."
+        }
 
-            JSON schema:
-            {
-            "shouldCreateTicket": boolean,
-            "title": string,
-            "category": "bug" | "feature" | "billing" | "account" | "other",
-            "priority": "low" | "medium" | "high",
-            "summary": string
-            }
+        Rules:
+        - Compliments or vague positivity => shouldCreateTicket=false and use empty strings for other fields.
+        - If shouldCreateTicket=false, set title/category/priority/summary to "".
+        - Summary must be 1-2 short sentences.
 
-            Rules:
-            - Compliments or vague positivity => shouldCreateTicket=false.
-            - Clear problem, request for help, bug report, billing/account issue => shouldCreateTicket=true.
-            - Keep title short (max 80 chars).
-            - Keep summary max 2 sentences.
-
-            Comment:
-            "%s"
-            """.formatted(escapeForPrompt(commentText));
+        Comment:
+        "%s"
+        """.formatted(escapeForPrompt(commentText));
     }
 
     private static String escapeForPrompt(String input) {
