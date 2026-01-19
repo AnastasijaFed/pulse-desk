@@ -2,6 +2,8 @@ package com.example.pulse_desk.service;
 import com.example.pulse_desk.dto.TicketResponse;
 import com.example.pulse_desk.exception.ResourceNotFoundException;
 import com.example.pulse_desk.model.Ticket;
+import com.example.pulse_desk.model.TicketCategory;
+import com.example.pulse_desk.model.TicketPriority;
 
 import java.util.List;
 
@@ -35,5 +37,11 @@ public class TicketService {
 
     public TicketResponse getTicket(Long id){
         return repository.findById(id).map(this::toResponse).orElseThrow(() -> new ResourceNotFoundException("No ticket with id " + id));
+    }
+
+    public TicketResponse createNewTicket(String title, String summary, TicketCategory category, TicketPriority priority, Long commentId){
+        Ticket ticket = new Ticket(title, summary, category, priority, commentId);
+        repository.save(ticket);
+        return toResponse(ticket);
     }
 }

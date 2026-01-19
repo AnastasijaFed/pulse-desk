@@ -10,22 +10,21 @@ import com.example.pulse_desk.dto.CommentResponse;
 import com.example.pulse_desk.exception.ResourceNotFoundException;
 import com.example.pulse_desk.model.Comment;
 import com.example.pulse_desk.model.CommentStatus;
-import com.example.pulse_desk.model.Ticket;
 import com.example.pulse_desk.model.TicketCategory;
 import com.example.pulse_desk.model.TicketPriority;
 import com.example.pulse_desk.repository.CommentRepository;
-import com.example.pulse_desk.repository.TicketRepository;
+
 
 @Service
 public class CommentService {
     private final CommentRepository commentRepository;
     private final AiTriageService aiService;
-    private final TicketRepository ticketRepository;
+    private final TicketService ticketService;
 
-    public CommentService(CommentRepository commentRepository, AiTriageService aiService, TicketRepository ticketRepository ){
+    public CommentService(CommentRepository commentRepository, AiTriageService aiService, TicketService ticketService ){
         this.commentRepository = commentRepository;
         this.aiService = aiService;
-        this.ticketRepository = ticketRepository;
+        this.ticketService = ticketService;
     }
 
      public List<CommentResponse> getAllComments() {
@@ -58,9 +57,8 @@ public class CommentService {
             AiTicketDecision decision = aiService.analyzeComment(comment.getContent());
             if (decision.shouldCreateTicket()) {
 
-            Ticket ticket = new Ticket(decision.title(), decision.summary(), TicketCategory.valueOf(decision.category().toUpperCase()), TicketPriority.valueOf(decision.priority().toUpperCase()), comment.getId());
-
-            ticketRepository.save(ticket);
+            ticketService.createNewTicket(decision.title(), decision.summary(), TicketCategory.valueOf(decision.category().toUpperCase()), TicketPriority.valueOf(decision.priority().toUpperCase()), comment.getId());
+            
             comment.setStatus(CommentStatus.TICKET_CREATED);
             }else{
                 comment.setStatus(CommentStatus.ANALYZED);
