@@ -42,7 +42,6 @@ class CommentServiceWithAiTest {
 
     @BeforeEach
     void setup() throws Exception {
-        // Simulate JPA assigning an ID to the Comment on first save
         when(commentRepository.save(any(Comment.class)))
                 .thenAnswer(invocation -> {
                     Comment c = invocation.getArgument(0);
@@ -84,7 +83,7 @@ class CommentServiceWithAiTest {
                         "User cannot log in"
                 ));
 
-        // Only stub TicketService in the test that actually uses it (avoids UnnecessaryStubbingException)
+       
         when(ticketService.createNewTicket(any(), any(), any(TicketCategory.class), any(TicketPriority.class), anyLong()))
                 .thenReturn(new TicketResponse(
                         100L,
@@ -96,7 +95,7 @@ class CommentServiceWithAiTest {
                         java.time.Instant.now()
                 ));
 
-        CommentResponse response = service.submitComment("I cannot log in", 5L);
+        CommentResponse response = service.submitComment("I cannot log in");
 
         assertEquals(CommentStatus.TICKET_CREATED.name(), response.status());
 
@@ -116,7 +115,7 @@ class CommentServiceWithAiTest {
         when(aiTriageService.analyzeComment(any()))
                 .thenThrow(new RuntimeException("HF down"));
 
-        CommentResponse response = service.submitComment("Something broke", 3L);
+        CommentResponse response = service.submitComment("Something broke");
 
         assertEquals(CommentStatus.ANALYSIS_FAILED.name(), response.status());
         verify(ticketService, never()).createNewTicket(any(), any(), any(), any(), anyLong());
@@ -130,7 +129,7 @@ class CommentServiceWithAiTest {
 
         InOrder inOrder = inOrder(commentRepository, aiTriageService);
 
-        service.submitComment("Test comment", 1L);
+        service.submitComment("Test comment");
 
         inOrder.verify(commentRepository).save(any(Comment.class));
         inOrder.verify(aiTriageService).analyzeComment(any());

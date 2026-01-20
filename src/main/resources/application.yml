@@ -1,6 +1,6 @@
 huggingface:
   base-url: https://router.huggingface.co/v1
-  model: HuggingFaceTB/SmolLM3-3B:hf-inference
+  model: Qwen/Qwen2.5-7B-Instruct
   timeout-ms: 8000
 logging:
   level:

@@ -33,7 +33,7 @@ class CommentControllerTest {
     @Test
     void getComments_returnsList() throws Exception {
         CommentResponse dto =
-                new CommentResponse(1L, "Hello", 5L, "RECEIVED", Instant.now());
+                new CommentResponse(1L, "Hello",  "RECEIVED", Instant.now());
 
         when(service.getAllComments()).thenReturn(List.of(dto));
 
@@ -47,15 +47,15 @@ class CommentControllerTest {
     @Test
     void postComments_createsComment() throws Exception {
         CommentResponse created =
-                new CommentResponse(99L, "Test", 7L, "RECEIVED", Instant.now());
+                new CommentResponse(99L, "Test", "RECEIVED", Instant.now());
 
-        when(service.submitComment("Test", 7L)).thenReturn(created);
+        when(service.submitComment("Test")).thenReturn(created);
 
         mockMvc.perform(post("/comments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"content\":\"Test\",\"userId\":7}"))
                 .andExpect(status().isCreated());
 
-        verify(service).submitComment("Test", 7L);
+        verify(service).submitComment("Test");
     }
 }

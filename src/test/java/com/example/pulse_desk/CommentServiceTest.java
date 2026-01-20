@@ -46,7 +46,6 @@ class CommentServiceTest {
         Comment c1 = mock(Comment.class);
         when(c1.getId()).thenReturn(1L);
         when(c1.getContent()).thenReturn("Nice app!");
-        when(c1.getUserId()).thenReturn(10L);
         when(c1.getStatus()).thenReturn(CommentStatus.ANALYZED);
         when(c1.getCreatedAt()).thenReturn(createdAt);
 
@@ -58,7 +57,6 @@ class CommentServiceTest {
         CommentResponse dto = result.get(0);
         assertEquals(1L, dto.id());
         assertEquals("Nice app!", dto.content());
-        assertEquals(10L, dto.userId());
         assertEquals("ANALYZED", dto.status());
         assertEquals(createdAt, dto.createdAt());
 
@@ -85,18 +83,16 @@ class CommentServiceTest {
 
         ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
 
-        CommentResponse dto = service.submitComment(content, userId);
+        CommentResponse dto = service.submitComment(content);
 
         verify(repository).save(captor.capture());
 
         Comment saved = captor.getValue();
         assertEquals(content, saved.getContent());
-        assertEquals(userId, saved.getUserId());
         assertEquals(CommentStatus.RECEIVED, saved.getStatus());
 
 
         assertEquals(content, dto.content());
-        assertEquals(userId, dto.userId());
         assertEquals("RECEIVED", dto.status());
 
 
