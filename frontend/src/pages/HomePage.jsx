@@ -1,33 +1,89 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import CommentSubmitForm from "../components/CommentSubmitForm";
 import TicketList from "../components/TicketList";
+import TicketInfo from "../components/TicketInfo";
+import RecentComments from "../components/RecentComments";
+import { fetchComments, fetchTickets } from "../api/Api";
+import "./HomePage.css"
 
 function HomePage() {
-  const [lastResult, setLastResult] = useState(null);
-  const [refreshKey, setRefreshKey] = useState(0);
+   const [comments, setComments] = useState([]);
+  const [tickets, setTickets] = useState([]);
 
-  function handleCommentSubmitted(result) {
-    setLastResult(result);
-    if (result.status === "TICKET_CREATED") {
-      setRefreshKey((k) => k + 1);
+  const [commentsLoading, setCommentsLoading] = useState(true);
+  const [ticketsLoading, setTicketsLoading] = useState(true);
+
+  const [commentsError, setCommentsError] = useState(null);
+  const [ticketsError, setTicketsError] = useState(null);
+
+  async function loadComments() {
+    setCommentsLoading(true);
+    setCommentsError(null);
+    try {
+      const data = await fetchComments();
+      setComments(Array.isArray(data) ? data : []);
+    } catch (e) {
+      setCommentsError(e.message || "Failed to load comments");
+    } finally {
+      setCommentsLoading(false);
     }
   }
 
+  async function loadTickets() {
+    setTicketsLoading(true);
+    setTicketsError(null);
+    try {
+      const data = await fetchTickets();
+      setTickets(Array.isArray(data) ? data : []);
+    } catch (e) {
+      setTicketsError(e.message || "Failed to load tickets");
+    } finally {
+      setTicketsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadComments();
+    loadTickets();
+  }, []);
+
+  async function handleSubmitted(newComment) {
+    setComments((prev) => [newComment, ...prev]);
+
+    if (newComment?.status === "TICKET_CREATED") {
+      await loadTickets();
+    }
+  }
+
+  const recentComments = useMemo(() => {
+    return [...comments]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 6);
+  }, [comments]);
+
   return (
-    <div style={{ padding: "2rem", maxWidth: 800 }}>
-      <h1>Pulse Desk</h1>
-      <p>AI-powered support triage</p>
+    <main className="container">
+        
+        <div className="grid">
+            <div className="comments">
+                <CommentSubmitForm onSubmitted={handleSubmitted} />
+                <div className="divider" />
+                <RecentComments comments={recentComments} loading={commentsLoading} error={commentsError} />
 
-      <CommentSubmitForm onSubmitted={handleCommentSubmitted} />
+            </div>
+            
+            <div className="tickets">
+                <TicketList tickets={tickets} loading={ticketsLoading} error={ticketsError} />
+            </div>
 
-      {lastResult && (
-        <p style={{ marginTop: "1rem" }}>
-          Status: <strong>{lastResult.status}</strong>
-        </p>
-      )}
+        </div>
+        
 
-      <TicketList refreshKey={refreshKey} />
-    </div>
+    
+
+    </main>
+      
+
   );
 }
 

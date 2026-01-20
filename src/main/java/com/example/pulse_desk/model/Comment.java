@@ -15,9 +15,6 @@ public class Comment {
     @Column(nullable = false)
     private String content; 
 
-    @Column(nullable = false)
-    private Long userId;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CommentStatus status;
@@ -29,9 +26,8 @@ public class Comment {
 
     }
 
-    public Comment(String content, Long userId, CommentStatus status){
+    public Comment(String content, CommentStatus status){
         this.content = content;
-        this.userId = userId;
         this.status = status;
         this.createdAt = Instant.now();
     }
@@ -42,10 +38,6 @@ public class Comment {
 
     public String getContent(){
         return content;
-    }
-    
-    public Long getUserId(){
-        return userId;
     }
 
     public CommentStatus getStatus(){

@@ -1,54 +1,41 @@
-import { useEffect, useState } from "react";
-import { fetchTickets } from "../api/Api";
-import TicketInfo from "./TicketInfo";
+import "./TicketList.css";
 
-function TicketList({ refreshKey }) {
-  const [tickets, setTickets] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  async function loadTickets() {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const data = await fetchTickets();
-      setTickets(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    loadTickets();
-  }, [refreshKey]);
-
+export default function TicketList({ tickets, loading, error }) {
   return (
-    <div style={{ marginTop: "2rem" }}>
-      <h2>Tickets</h2>
+    <div>
+      <h2 className="h2">Support Tickets</h2>
 
-      {loading && <p>Loading tickets...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {loading && <p className="small">Loading…</p>}
+      {error && <p className="error">{error}</p>}
 
-      {!loading && tickets.length === 0 && (
-        <p>No tickets created yet.</p>
+      {!loading && !error && tickets.length === 0 && (
+        <p className="small">No tickets created yet.</p>
       )}
 
-      {!loading && tickets.length > 0 && (
-        <table border="1" cellPadding="8">
+      {!loading && !error && tickets.length > 0 && (
+        <table className="table">
           <thead>
             <tr>
+              <th>ID</th>
               <th>Title</th>
               <th>Category</th>
               <th>Priority</th>
               <th>Summary</th>
+              <th>Created</th>
             </tr>
           </thead>
           <tbody>
             {tickets.map((t) => (
-              <TicketInfo key={t.id} ticket={t} />
+              <tr key={t.id}>
+                <td><strong>TK-{t.id}</strong></td>
+                <td>{t.title}</td>
+                <td>{t.category}</td>
+                <td>{t.priority}</td>
+                <td className="summaryCell">{t.summary}</td>
+                <td className="timeCell">
+                  {t.createdAt ? new Date(t.createdAt).toLocaleString() : ""}
+                </td>
+              </tr>
             ))}
           </tbody>
         </table>
@@ -56,5 +43,3 @@ function TicketList({ refreshKey }) {
     </div>
   );
 }
-
-export default TicketList;

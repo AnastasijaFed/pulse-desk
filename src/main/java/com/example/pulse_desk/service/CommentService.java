@@ -1,7 +1,6 @@
 package com.example.pulse_desk.service;
 import java.util.List;
 
-
 import org.springframework.stereotype.Service;
 
 import com.example.pulse_desk.ai.AiTicketDecision;
@@ -46,14 +45,13 @@ public class CommentService {
         return new CommentResponse(
                 comment.getId(),
                 comment.getContent(),
-                comment.getUserId(),
                 comment.getStatus().name(),
                 comment.getCreatedAt() 
         );
     }
 
-    public CommentResponse submitComment(String content, Long userId){
-        Comment comment = new Comment(content, userId, CommentStatus.RECEIVED);
+    public CommentResponse submitComment(String content){
+        Comment comment = new Comment(content, CommentStatus.RECEIVED);
         commentRepository.save(comment);
         try {
 

@@ -1,0 +1,23 @@
+.detailsGrid{
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 10px 14px;
+}
+
+.label{
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.value{
+  font-size: 14px;
+}
+
+.desc{
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  padding: 12px;
+  line-height: 1.45;
+  color: #334155;
+}

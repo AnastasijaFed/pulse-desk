@@ -1,0 +1,37 @@
+.container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.comments, .tickets {
+  width: 100%;
+}
+
+.divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 24px 0;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 30px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+}

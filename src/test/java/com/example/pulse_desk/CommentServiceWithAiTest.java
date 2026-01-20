@@ -66,7 +66,7 @@ class CommentServiceWithAiTest {
                         null
                 ));
 
-        CommentResponse response = service.submitComment("Nice app!", 10L);
+        CommentResponse response = service.submitComment("Nice app!");
 
         assertEquals(CommentStatus.ANALYZED.name(), response.status());
         verify(ticketService, never()).createNewTicket(any(), any(), any(), any(), anyLong());
