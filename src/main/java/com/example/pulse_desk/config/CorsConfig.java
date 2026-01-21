@@ -13,7 +13,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOriginPatterns("http://localhost:5173", 
+                        .allowedOriginPatterns("http://localhost:5173", "https://pulse-desk-*.vercel.app",
                             "https://pulse-desk-bwfz.vercel.app")
                         .allowedMethods("*")
                         .allowedHeaders("*")
