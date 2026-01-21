@@ -11,4 +11,5 @@ public record AiTicketDecision(
         String category,   
         String priority,  
         String summary
+        
 ) {}
