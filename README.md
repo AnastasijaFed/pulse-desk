@@ -5,6 +5,11 @@ PulseDesk is a lightweight AI-powered support triage system that analyzes user c
 The backend is built with Spring Boot (Java) and integrates with the Hugging Face Inference API using the Qwen/Qwen2.5-7B-Instruct model.  
 The frontend is built with React (Vite) and provides a clean, single-page interface for submitting comments and viewing tickets in real time.
 
+The website is accessible via: https://pulse-desk-yket.vercel.app/
+
+**The initial lag is caused by cold starts: the Render server must reboot the entire Java app after 15 minutes of sleep, and the Hugging Face AI needs to load its model weights into memory. After the first request, performance improves significantly because the JVM optimizes the code and the backend reuses established network connections.**
+
+
 ---
 
 ## Features
